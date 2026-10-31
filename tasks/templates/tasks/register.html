@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ro‘yxatdan o‘tish | TaskFlow</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 23px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: 2px solid #c7d2fe;
+            border-color: #6366f1;
+        }
+
+        .help {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: 6px;
+        }
+
+        .errors {
+            color: #b91c1c;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover {
+            background: #4338ca;
+        }
+
+        .login-link {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-card">
+
+        <div class="logo">TaskFlow</div>
+
+        <h2>Hisob yaratish</h2>
+
+        <p class="subtitle">
+            Shaxsiy vazifalaringizni boshqarish uchun
+            yangi akkaunt oching.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">
+                    Username
+                </label>
+
+                {{ form.username }}
+
+                {% if form.username.errors %}
+                    <div class="errors">
+                        {{ form.username.errors }}
+                    </div>
+                {% endif %}
+
+                <p class="help">
+                    Tizimga kirishda ishlatadigan nomingiz.
+                </p>
+            </div>
+
+            <div class="field">
+                <label for="{{ form.password1.id_for_label }}">
+                    Parol
+                </label>
+
+                {{ form.password1 }}
+
+                {% if form.password1.errors %}
+                    <div class="errors">
+                        {{ form.password1.errors }}
+                    </div>
+                {% endif %}
+
+                <p class="help">
+                    Kuchli va boshqalarga oshkor qilmaydigan
+                    parol tanlang.
+                </p>
+            </div>
+
+            <div class="field">
+                <label for="{{ form.password2.id_for_label }}">
+                    Parolni tasdiqlash
+                </label>
+
+                {{ form.password2 }}
+
+                {% if form.password2.errors %}
+                    <div class="errors">
+                        {{ form.password2.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Ro‘yxatdan o‘tish
+            </button>
+        </form>
+
+        <div class="login-link">
+            Akkauntingiz bormi?
+            <a href="{% url 'login' %}">Tizimga kirish</a>
+        </div>
+
+    </div>
+</body>
+</html>

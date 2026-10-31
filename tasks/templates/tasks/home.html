@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow — Vazifalarim</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6fb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 7%;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 7px;
+            background: #fee2e2;
+            color: #b91c1c;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .welcome h1 {
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #64748b;
+        }
+
+        .task-form, .task-card {
+            padding: 22px;
+            margin-bottom: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .task-form h2 {
+            margin-top: 0;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 13px;
+            border: 1px solid #dbe1ea;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .add-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .task-card h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .task-card.completed h3 {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        .description {
+            color: #64748b;
+            white-space: pre-wrap;
+        }
+
+        .date {
+            margin-top: 15px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .task-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .edit-btn, .delete-btn, .complete-btn {
+            display: inline-block;
+            padding: 9px 15px;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .complete-btn {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .empty {
+            padding: 35px;
+            text-align: center;
+            color: #94a3b8;
+            background: white;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 15px 5%;
+            }
+
+            .user-area {
+                gap: 8px;
+                font-size: 13px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">TaskFlow</div>
+
+        <div class="user-area">
+            <span>{{ request.user.username }}</span>
+
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="logout-btn" type="submit">Chiqish</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <section class="welcome">
+            <h1>Xush kelibsiz, {{ request.user.username }}!</h1>
+            <p>Bugungi vazifalaringizni shu yerda boshqaring.</p>
+        </section>
+
+        <section class="task-form">
+            <h2>Yangi vazifa</h2>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Vazifa nomini kiriting..."
+                    required
+                >
+
+                <textarea
+                    name="description"
+                    placeholder="Vazifa haqida qisqacha..."
+                ></textarea>
+
+                <button class="add-btn" type="submit">
+                    + Vazifa qo'shish
+                </button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Vazifalarim</h2>
+
+            {% for task in tasks %}
+                <div class="task-card {% if task.is_completed %}completed{% endif %}">
+
+                    <h3>
+                        {% if task.is_completed %}✓ {% endif %}
+                        {{ task.title }}
+                    </h3>
+
+                    {% if task.description %}
+                        <p class="description">{{ task.description }}</p>
+                    {% endif %}
+
+                    <p class="date">
+                        Yaratilgan: {{ task.created_at|date:"d.m.Y H:i" }}
+                    </p>
+
+                    <div class="task-actions">
+
+                        <form method="POST" action="{% url 'complete_task' task.id %}">
+                            {% csrf_token %}
+
+                            <button class="complete-btn" type="submit">
+                                {% if task.is_completed %}
+                                    Qaytarish
+                                {% else %}
+                                    Bajarildi
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <a
+                            class="edit-btn"
+                            href="{% url 'edit_task' task.id %}"
+                        >
+                            Tahrirlash
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{% url 'delete_task' task.id %}"
+                            onsubmit="return confirm('Bu vazifani o‘chirmoqchimisiz?');"
+                        >
+                            {% csrf_token %}
+
+                            <button class="delete-btn" type="submit">
+                                O'chirish
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            {% empty %}
+                <div class="empty">
+                    Hozircha vazifalar mavjud emas.
+                    Birinchi vazifangizni qo'shing!
+                </div>
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+</body>
+</html>
